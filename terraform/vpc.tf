@@ -92,16 +92,25 @@ resource "aws_security_group" "glue_job" {
   vpc_id      = module.glue_vpc.vpc_id
 }
 
-resource "aws_security_group_rule" "glue_job_egress_internet" {
+resource "aws_security_group_rule" "glue_job_egress_s3" {
   type              = "egress"
   protocol          = "-1"
   to_port           = 443
   from_port         = 443
-  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.glue_job.id
+  prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
 }
 
-# A requirement for the Glue SG to allow all ingress
+# A requirement for the Glue SG to allow all ingress/egress
+resource "aws_security_group_rule" "glue_job_egress_all" {
+  type              = "egress"
+  protocol          = "tcp"
+  to_port           = 65535
+  from_port         = 0
+  security_group_id = aws_security_group.glue_job.id
+  self              = true
+}
+
 resource "aws_security_group_rule" "glue_job_ingress_all" {
   type              = "ingress"
   protocol          = "tcp"

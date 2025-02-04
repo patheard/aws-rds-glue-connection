@@ -29,7 +29,7 @@ module "glue_db" {
 }
 
 resource "aws_secretsmanager_secret" "rds_connector" {
-  name = "rds-connector"
+  name = "rds-connector-${var.env}"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_connector" {
